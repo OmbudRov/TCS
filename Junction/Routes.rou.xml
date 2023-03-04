@@ -1,0 +1,124 @@
+<route>
+    <!-- Defining the Car -->
+    <vType accel="1",decel="4",id="Car",length="5",minGap="3",maxSpeed="30",sigma="0.5">
+    
+    <!-- Defining Routes From Northern Road -->
+        <route id="NW" edges="N_TL TL_W"/>
+        <route id="NE" edges="N_TL TL_E"/>
+        <route id="NS" edges="N_TL TL_S"/>
+    <!-- Defining Routes From Southern Road -->
+        <route id="SW" edges="S_TL TL_W"/>
+        <route id="SN" edges="S_TL TL_N"/>
+        <route id="SE" edges="S_TL TL_E"/>
+    <!-- Defining Routes From Eastern Road -->
+        <route id="EW" edges="E_TL TL_W"/>
+        <route id="EN" edges="E_TL TL_N"/>
+        <route id="ES" edges="E_TL TL_S"/>
+    <!-- Defining Routes From Western Road -->
+        <route id="WN" edges="W_TL TL_N"/>
+        <route id="WE" edges="W_TL TL_E"/>
+        <route id="WS" edges="W_TL TL_S"/>
+
+    <!-- Vehicles -->
+    <vehicle id="EW_0" type="Car" route="EW" depart="421.0" departLane="random" departSpeed="10" />
+    <vehicle id="NS_1" type="Car" route="NS" depart="470.0" departLane="random" departSpeed="10" />
+    <vehicle id="EN_2" type="Car" route="EN" depart="621.0" departLane="random" departSpeed="10" />
+    <vehicle id="NS_3" type="Car" route="NS" depart="680.0" departLane="random" departSpeed="10" />
+    <vehicle id="NS_4" type="Car" route="NS" depart="711.0" departLane="random" departSpeed="10" />
+    <vehicle id="NS_5" type="Car" route="NS" depart="741.0" departLane="random" departSpeed="10" />
+    <vehicle id="WS_6" type="Car" route="WS" depart="816.0" departLane="random" departSpeed="10" />
+    <vehicle id="ES_7" type="Car" route="ES" depart="840.0" departLane="random" departSpeed="10" />
+    <vehicle id="WE_8" type="Car" route="WE" depart="877.0" departLane="random" departSpeed="10" />
+    <vehicle id="SN_9" type="Car" route="SN" depart="989.0" departLane="random" departSpeed="10" />
+    <vehicle id="EN_10" type="Car" route="EN" depart="1005.0" departLane="random" departSpeed="10" />
+    <vehicle id="NS_11" type="Car" route="NS" depart="1096.0" departLane="random" departSpeed="10" />
+    <vehicle id="SN_12" type="Car" route="SN" depart="1115.0" departLane="random" departSpeed="10" />
+    <vehicle id="WE_13" type="Car" route="WE" depart="1231.0" departLane="random" departSpeed="10" />
+    <vehicle id="SN_14" type="Car" route="SN" depart="1262.0" departLane="random" departSpeed="10" />
+    <vehicle id="EN_15" type="Car" route="EN" depart="1272.0" departLane="random" departSpeed="10" />
+    <vehicle id="SN_16" type="Car" route="SN" depart="1280.0" departLane="random" departSpeed="10" />
+    <vehicle id="ES_17" type="Car" route="ES" depart="1295.0" departLane="random" departSpeed="10" />
+    <vehicle id="WE_18" type="Car" route="WE" depart="1301.0" departLane="random" departSpeed="10" />
+    <vehicle id="SN_19" type="Car" route="SN" depart="1353.0" departLane="random" departSpeed="10" />
+    <vehicle id="EW_20" type="Car" route="EW" depart="1363.0" departLane="random" departSpeed="10" />
+    <vehicle id="WE_21" type="Car" route="WE" depart="1382.0" departLane="random" departSpeed="10" />
+    <vehicle id="SE_22" type="Car" route="SE" depart="1424.0" departLane="random" departSpeed="10" />
+    <vehicle id="NE_23" type="Car" route="NE" depart="1479.0" departLane="random" departSpeed="10" />
+    <vehicle id="WE_24" type="Car" route="WE" depart="1494.0" departLane="random" departSpeed="10" />
+    <vehicle id="EW_25" type="Car" route="EW" depart="1512.0" departLane="random" departSpeed="10" />
+    <vehicle id="EW_26" type="Car" route="EW" depart="1541.0" departLane="random" departSpeed="10" />
+    <vehicle id="SN_27" type="Car" route="SN" depart="1543.0" departLane="random" departSpeed="10" />
+    <vehicle id="EW_28" type="Car" route="EW" depart="1559.0" departLane="random" departSpeed="10" />
+    <vehicle id="NS_29" type="Car" route="NS" depart="1559.0" departLane="random" departSpeed="10" />
+    <vehicle id="WS_30" type="Car" route="WS" depart="1583.0" departLane="random" departSpeed="10" />
+    <vehicle id="NW_31" type="Car" route="NW" depart="1586.0" departLane="random" departSpeed="10" />
+    <vehicle id="EW_32" type="Car" route="EW" depart="1633.0" departLane="random" departSpeed="10" />
+    <vehicle id="NS_33" type="Car" route="NS" depart="1695.0" departLane="random" departSpeed="10" />
+    <vehicle id="SN_34" type="Car" route="SN" depart="1740.0" departLane="random" departSpeed="10" />
+    <vehicle id="WS_35" type="Car" route="WS" depart="1809.0" departLane="random" departSpeed="10" />
+    <vehicle id="SE_36" type="Car" route="SE" depart="1811.0" departLane="random" departSpeed="10" />
+    <vehicle id="EW_37" type="Car" route="EW" depart="1822.0" departLane="random" departSpeed="10" />
+    <vehicle id="SN_38" type="Car" route="SN" depart="1847.0" departLane="random" departSpeed="10" />
+    <vehicle id="SN_39" type="Car" route="SN" depart="1860.0" departLane="random" departSpeed="10" />
+    <vehicle id="EN_40" type="Car" route="EN" depart="1892.0" departLane="random" departSpeed="10" />
+    <vehicle id="WE_41" type="Car" route="WE" depart="1950.0" departLane="random" departSpeed="10" />
+    <vehicle id="WE_42" type="Car" route="WE" depart="1977.0" departLane="random" departSpeed="10" />
+    <vehicle id="WE_43" type="Car" route="WE" depart="2057.0" departLane="random" departSpeed="10" />
+    <vehicle id="WN_44" type="Car" route="WN" depart="2059.0" departLane="random" departSpeed="10" />
+    <vehicle id="NE_45" type="Car" route="NE" depart="2072.0" departLane="random" departSpeed="10" />
+    <vehicle id="NW_46" type="Car" route="NW" depart="2102.0" departLane="random" departSpeed="10" />
+    <vehicle id="SN_47" type="Car" route="SN" depart="2109.0" departLane="random" departSpeed="10" />
+    <vehicle id="WE_48" type="Car" route="WE" depart="2112.0" departLane="random" departSpeed="10" />
+    <vehicle id="SN_49" type="Car" route="SN" depart="2148.0" departLane="random" departSpeed="10" />
+    <vehicle id="EW_50" type="Car" route="EW" depart="2168.0" departLane="random" departSpeed="10" />
+    <vehicle id="EN_51" type="Car" route="EN" depart="2184.0" departLane="random" departSpeed="10" />
+    <vehicle id="ES_52" type="Car" route="ES" depart="2195.0" departLane="random" departSpeed="10" />
+    <vehicle id="NS_53" type="Car" route="NS" depart="2283.0" departLane="random" departSpeed="10" />
+    <vehicle id="SW_54" type="Car" route="SW" depart="2294.0" departLane="random" departSpeed="10" />
+    <vehicle id="ES_55" type="Car" route="ES" depart="2383.0" departLane="random" departSpeed="10" />
+    <vehicle id="SN_56" type="Car" route="SN" depart="2395.0" departLane="random" departSpeed="10" />
+    <vehicle id="WE_57" type="Car" route="WE" depart="2415.0" departLane="random" departSpeed="10" />
+    <vehicle id="WE_58" type="Car" route="WE" depart="2422.0" departLane="random" departSpeed="10" />
+    <vehicle id="NS_59" type="Car" route="NS" depart="2424.0" departLane="random" departSpeed="10" />
+    <vehicle id="EW_60" type="Car" route="EW" depart="2439.0" departLane="random" departSpeed="10" />
+    <vehicle id="EW_61" type="Car" route="EW" depart="2443.0" departLane="random" departSpeed="10" />
+    <vehicle id="SN_62" type="Car" route="SN" depart="2490.0" departLane="random" departSpeed="10" />
+    <vehicle id="WE_63" type="Car" route="WE" depart="2536.0" departLane="random" departSpeed="10" />
+    <vehicle id="EW_64" type="Car" route="EW" depart="2552.0" departLane="random" departSpeed="10" />
+    <vehicle id="SN_65" type="Car" route="SN" depart="2573.0" departLane="random" departSpeed="10" />
+    <vehicle id="SN_66" type="Car" route="SN" depart="2706.0" departLane="random" departSpeed="10" />
+    <vehicle id="EW_67" type="Car" route="EW" depart="2763.0" departLane="random" departSpeed="10" />
+    <vehicle id="WE_68" type="Car" route="WE" depart="2768.0" departLane="random" departSpeed="10" />
+    <vehicle id="EW_69" type="Car" route="EW" depart="2779.0" departLane="random" departSpeed="10" />
+    <vehicle id="NS_70" type="Car" route="NS" depart="2806.0" departLane="random" departSpeed="10" />
+    <vehicle id="NS_71" type="Car" route="NS" depart="2836.0" departLane="random" departSpeed="10" />
+    <vehicle id="NS_72" type="Car" route="NS" depart="2852.0" departLane="random" departSpeed="10" />
+    <vehicle id="EW_73" type="Car" route="EW" depart="2867.0" departLane="random" departSpeed="10" />
+    <vehicle id="NS_74" type="Car" route="NS" depart="2888.0" departLane="random" departSpeed="10" />
+    <vehicle id="NS_75" type="Car" route="NS" depart="2919.0" departLane="random" departSpeed="10" />
+    <vehicle id="NS_76" type="Car" route="NS" depart="2926.0" departLane="random" departSpeed="10" />
+    <vehicle id="WE_77" type="Car" route="WE" depart="2928.0" departLane="random" departSpeed="10" />
+    <vehicle id="EW_78" type="Car" route="EW" depart="2935.0" departLane="random" departSpeed="10" />
+    <vehicle id="SN_79" type="Car" route="SN" depart="2992.0" departLane="random" departSpeed="10" />
+    <vehicle id="SN_80" type="Car" route="SN" depart="2994.0" departLane="random" departSpeed="10" />
+    <vehicle id="WE_81" type="Car" route="WE" depart="2996.0" departLane="random" departSpeed="10" />
+    <vehicle id="SW_82" type="Car" route="SW" depart="3063.0" departLane="random" departSpeed="10" />
+    <vehicle id="NS_83" type="Car" route="NS" depart="3073.0" departLane="random" departSpeed="10" />
+    <vehicle id="EW_84" type="Car" route="EW" depart="3155.0" departLane="random" departSpeed="10" />
+    <vehicle id="SN_85" type="Car" route="SN" depart="3164.0" departLane="random" departSpeed="10" />
+    <vehicle id="WE_86" type="Car" route="WE" depart="3324.0" departLane="random" departSpeed="10" />
+    <vehicle id="SW_87" type="Car" route="SW" depart="3650.0" departLane="random" departSpeed="10" />
+    <vehicle id="WE_88" type="Car" route="WE" depart="3668.0" departLane="random" departSpeed="10" />
+    <vehicle id="NE_89" type="Car" route="NE" depart="3691.0" departLane="random" departSpeed="10" />
+    <vehicle id="WE_90" type="Car" route="WE" depart="3790.0" departLane="random" departSpeed="10" />
+    <vehicle id="WE_91" type="Car" route="WE" depart="4036.0" departLane="random" departSpeed="10" />
+    <vehicle id="WE_92" type="Car" route="WE" depart="4065.0" departLane="random" departSpeed="10" />
+    <vehicle id="NW_93" type="Car" route="NW" depart="4123.0" departLane="random" departSpeed="10" />
+    <vehicle id="SN_94" type="Car" route="SN" depart="4229.0" departLane="random" departSpeed="10" />
+    <vehicle id="SN_95" type="Car" route="SN" depart="4365.0" departLane="random" departSpeed="10" />
+    <vehicle id="NS_96" type="Car" route="NS" depart="4481.0" departLane="random" departSpeed="10" />
+    <vehicle id="EW_97" type="Car" route="EW" depart="4707.0" departLane="random" departSpeed="10" />
+    <vehicle id="NS_98" type="Car" route="NS" depart="5095.0" departLane="random" departSpeed="10" />
+    <vehicle id="SW_99" type="Car" route="SW" depart="5214.0" departLane="random" departSpeed="10" />
+
+</route>
