@@ -1,2 +1,2 @@
 # TCS
-wacky RL project with some hijinks
+wacky RL project with some hijinks and tomfoolery 
