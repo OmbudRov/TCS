@@ -8,7 +8,7 @@ def parse_args() -> argparse.Namespace:
     """Takes arguments from command line."""
     Parser=argparse.ArgumentParser()
     
-    Parser.add_argument('--mode',help='Choose between making a new model and working further on an existing model',choices=['normal','Retraining'],default='normal')
+    Parser.add_argument('--mode',help='Choose between making a new model and working further on an existing model',choices=['normal','retraining'],default='normal')
     Parser.add_argument('--gui',help='GUI display option',type=bool,default=False)
     Parser.add_argument('--episodes',help='Total Number of Episodes to train the model on',default=10)
     Parser.add_argument('--max_steps',help='Max Number of steps that can be taken',type=int,default=5400)
@@ -50,4 +50,6 @@ if __name__ == "__main__":
     os.makedirs(os.path.dirname(DataPath),exist_ok=True) #Makes a Directory for the current model being trained
     
     Episode=0
-    Start_TimeStamp=datetime.datetime.now()
+    Start_TimeStamp=datetime.datetime.now() # To Show the starting time when the program is done executing
+    if(args.mode=='normal'):
+        Model=Model()
