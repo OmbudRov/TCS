@@ -3,6 +3,8 @@ import sys
 import os
 import datetime
 
+from model import Model
+
 from sumolib import checkBinary
 def parse_args() -> argparse.Namespace:
     """Takes arguments from command line."""
@@ -14,6 +16,8 @@ def parse_args() -> argparse.Namespace:
     Parser.add_argument('--max_steps',help='Max Number of steps that can be taken',type=int,default=5400)
     Parser.add_argument('--n_cars',help='Number of cars to be generated in each episode',type=int,default=1000)
     
+    Parser.add_argument('--num_layers',help='Number of Layers in the Nueral Network',type=int,default=5)
+    Parser.add_argument('--width_layers',help='Dimensionality of the Output Space',type=int,default=400)
     return Parser.parse_args()
 
 if __name__ == "__main__":
@@ -52,4 +56,4 @@ if __name__ == "__main__":
     Episode=0
     Start_TimeStamp=datetime.datetime.now() # To Show the starting time when the program is done executing
     if(args.mode=='normal'):
-        Model=Model()
+        Model=Model(args.num_layers,args.width_layers)

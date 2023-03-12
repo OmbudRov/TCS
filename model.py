@@ -10,18 +10,22 @@ from keras.models import load_model
 class Model:
     # Basic class definition
     def __init__(self, num_layers, width, batch_size, learning_rate, input_dim, output_dim, model=None):
-        self._input_dim = input_dim
-        self._output_dim = output_dim
-        self._batch_size = batch_size
-        self._learning_rate = learning_rate
+        self.input_dim = input_dim
+        self.output_dim = output_dim
+        self.batch_size = batch_size
+        self.learning_rate = learning_rate
         if model:
-            self._model = model
+            self.model = model
         else:
-            self._model = self._build_model(num_layers, width)
+            self.model = self.BuildModel(num_layers, width)
     
     #Builds a fully connected nueral network
-    def _build_model(self, num_layers, width):
-        Input=keras.Input()
-        Output=layers.Dense()
-        Model=keras.Model(inputs=Inout,outputs=Output,name='MyModel')
+    def BuildModel(self, num_layers, width):
+        Input=keras.Input(shape=(self.input_dim,))
+        Output=layers.Dense(width, activation='relu')(Input)
+        for _ in range(num_layers):
+            Output=layers.Dense(width, activation='relu')(Output)
+        Output=layers.Dense(self.output_dim,activation='linear')(Output)
+        Model=keras.Model(inputs=Input,outputs=Output,name='MyModel')
+        Model.compile(loss=losses.mean_squared_error,optimizer=Adam(learning_rate=self.learning_rate))
         return Model
