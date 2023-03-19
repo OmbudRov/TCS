@@ -76,4 +76,5 @@ if __name__ == "__main__":
         # Graphs and Stuff
         Visualization=Visualization(DataPath,args.dpi)
         
-        Traffic = TrafficGen()
+        #Generate Traffic/Routes taken by cars
+        Traffic = TrafficGen(args.max_steps, args.n_cars)
