@@ -10,7 +10,7 @@ from utilities import Visualization
 
 from sumolib import checkBinary
 def parse_args() -> argparse.Namespace:
-    """Takes arguments from command line."""
+    # Takes arguments from command line
     Parser=argparse.ArgumentParser()
     
     # Misc arguments
