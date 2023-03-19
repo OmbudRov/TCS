@@ -6,7 +6,7 @@ import os
 import datetime
 
 from model import Model
-from utilities import Visualization
+from utilities import Visualization, TrafficGen
 
 from sumolib import checkBinary
 def parse_args() -> argparse.Namespace:
@@ -75,3 +75,5 @@ if __name__ == "__main__":
         
         # Graphs and Stuff
         Visualization=Visualization(DataPath,args.dpi)
+        
+        Traffic = TrafficGen()
