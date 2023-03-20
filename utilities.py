@@ -12,7 +12,7 @@ class Visualization:
         self.path=path
         self.dpi=dpi # Resolution in "Dots Per Inch"
         
-    def Data_And_Plot(self, data, filename, xlabel, ylabel):
+    def DataAndPlot(self, data, filename, xlabel, ylabel):
         min=min(data)
         max=max(data)
         
@@ -39,7 +39,7 @@ class TrafficGen:
         self.N_Cars=N_Cars
         self.MaxSteps=MaxSteps
         
-    def generate_routes(self, seed):
+    def GenerateRoutes(self, seed):
         # Generate route of cars every episode
         
         # Make tests reproducible
@@ -85,8 +85,8 @@ class TrafficGen:
                 <route id="WS" edges="W_TL TL_S"/>""",file=route)
             
             for cc,step in enumerate(CarGen):
-                Straight_Or_Turn = np.random.uniform()
-                if Straight_Or_Turn < 0.73: # Cars go straight 73% of the time
+                StraightOrTurn = np.random.uniform()
+                if StraightOrTurn < 0.73: # Cars go straight 73% of the time
                     rs=np.random.randint(1,5) # Helps choose which straight route a car should take
                     if rs==1:
                         print('    <vehicle id="WE_%i" type="Car" route="WE" depart="%s" departLane="random" departSpeed="10" />' % (cc,step), file=route)

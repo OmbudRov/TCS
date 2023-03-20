@@ -53,7 +53,7 @@ if __name__ == "__main__":
     # "--no-step-logging" disables console output of current simulation step
     # "--waiting-time-memory" is the length of time interval, over which accumulated waiting time is taken into account
     # "str()" sets the maximum amount of steps allowed in the simulation
-    sumo_cmd=[sumoBinary,"-c",os.path.join('Junction','Config.sumocfg'),"--no-step-logging","--waiting-time-memory",str(args.MaxSteps)]  
+    SumoCmd=[sumoBinary,"-c",os.path.join('Junction','Config.sumocfg'),"--no-step-logging","--waiting-time-memory",str(args.MaxSteps)]  
     
     #Setting up the Directory for trained models
     ModelPath=os.path.join(os.getcwd(),"Models",'')
