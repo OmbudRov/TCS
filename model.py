@@ -9,23 +9,23 @@ from keras.models import load_model
 
 class Model:
     # Basic class definition
-    def __init__(self, num_layers, width, batch_size, learning_rate, input_dim, output_dim, model=None):
-        self.input_dim = input_dim
-        self.output_dim = output_dim
-        self.batch_size = batch_size
-        self.learning_rate = learning_rate
+    def __init__(self, NumLayers, width, BatchSize, LearningRate, InputDimension, OutputDimension, model=None):
+        self.InputDimension = InputDimension
+        self.OutputDimension = OutputDimension
+        self.BatchSize = BatchSize
+        self.LearningRate = LearningRate
         if model:
             self.model = model
         else:
-            self.model = self.BuildModel(num_layers, width)
+            self.model = self.BuildModel(NumLayers, width)
     
     #Builds a fully connected nueral network
-    def BuildModel(self, num_layers, width):
-        Input=keras.Input(shape=(self.input_dim,))
+    def BuildModel(self, NumLayers, width):
+        Input=keras.Input(shape=(self.InputDimension,))
         Output=layers.Dense(width, activation='relu')(Input)
-        for _ in range(num_layers):
+        for _ in range(NumLayers):
             Output=layers.Dense(width, activation='relu')(Output)
-        Output=layers.Dense(self.output_dim,activation='linear')(Output)
+        Output=layers.Dense(self.OutputDimension,activation='linear')(Output)
         Model=keras.Model(inputs=Input,outputs=Output,name='MyModel')
-        Model.compile(loss=losses.mean_squared_error,optimizer=Adam(learning_rate=self.learning_rate))
+        Model.compile(loss=losses.mean_squared_error,optimizer=Adam(LearningRate=self.LearningRate))
         return Model

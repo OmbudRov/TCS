@@ -35,9 +35,9 @@ class Visualization:
 
 
 class TrafficGen:
-    def __init__(self, max_steps, n_cars):
-        self.n_cars=n_cars
-        self.max_steps=max_steps
+    def __init__(self, MaxSteps, N_Cars):
+        self.N_Cars=N_Cars
+        self.MaxSteps=MaxSteps
         
     def generate_routes(self, seed):
         # Generate route of cars every episode
@@ -46,19 +46,19 @@ class TrafficGen:
         np.random.seed(seed)
         
         # Cars generate according to weibull distribution (https://en.wikipedia.org/wiki/Weibull_distribution) and sort them
-        Timing=np.sort(np.random.weibull(2,self.n_cars))
+        Timing=np.sort(np.random.weibull(2,self.N_Cars))
         
-        # Fit the distribution in the interval between 0 to max_steps
-        car_gen=[]
-        min_old=math.floor(Timing[1])
-        max_old=math.floor(Timing[-1])
-        min_new=0
-        max_new=self.max_steps
+        # Fit the distribution in the interval between 0 to MaxSteps
+        CarGen=[]
+        OldMin=math.floor(Timing[1])
+        OldMax=math.floor(Timing[-1])
+        NewMin=0
+        NewMax=self.MaxSteps
         for x in Timing:
-            car_gen=np.append(car_gen,((max_new-min_new)/(max_old-min_old)))
+            CarGen=np.append(CarGen,((NewMax-NewMin)/(OldMax-OldMin)))
         
         #round every value to int, ie effective steps to determine when a car will be generated
-        car_gen=np.rint(car_gen)
+        CarGen=np.rint(CarGen)
         
         
         # Make the file for car generation, each new line represents a new car
@@ -84,7 +84,7 @@ class TrafficGen:
                 <route id="WE" edges="W_TL TL_E"/>
                 <route id="WS" edges="W_TL TL_S"/>""",file=route)
             
-            for cc,step in enumerate(car_gen):
+            for cc,step in enumerate(CarGen):
                 Straight_Or_Turn = np.random.uniform()
                 if Straight_Or_Turn < 0.73: # Cars go straight 73% of the time
                     rs=np.random.randint(1,5) # Helps choose which straight route a car should take
