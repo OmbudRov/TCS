@@ -5,7 +5,7 @@ import sys
 import os
 import datetime
 
-from model import Model
+from model import TrainModel
 from utilities import Visualization, TrafficGen
 
 from sumolib import checkBinary
@@ -71,7 +71,7 @@ if __name__ == "__main__":
     Start_TimeStamp=datetime.datetime.now() # To Show the starting time when the program is done executing
     if(args.mode=='normal'):
         # Initialising the Model
-        Model=Model(args.NumLayers,args.LayerWidth,args.BatchSize,args.LearningRate,args.NumStates,args.NumActions)
+        Model=TrainModel(args.NumLayers,args.LayerWidth,args.BatchSize,args.LearningRate,args.NumStates,args.NumActions)
         
         # Graphs and Stuff
         Visualization=Visualization(DataPath,args.dpi)

@@ -14,19 +14,197 @@ EWL_Green=6
 EWL_Yellow=7
 
 class TrainingSimulation:
-    def __init__(self, Model, Memory, Traffic, sumo, gamma, max_steps, green_duration, yellow_duration, num_states, num_actions, training_epochs):
+    # Basic Class Definition
+    def __init__(self, Model, Memory, Traffic, Sumo, Gamma, MaxSteps, GreenDuration, YellowDuration, NumStates, NumActions, TrainingEpochs):
         self.Model=Model
         self.Memory = Memory
         self.Traffic = Traffic
-        self.gamma = gamma
-        self.step = 0
-        self.sumo = sumo
-        self.max_steps = max_steps
-        self.green_duration = green_duration
-        self.yellow_duration = yellow_duration
-        self.num_states = num_states
-        self.num_actions = num_actions
-        self.reward_store = []
-        self.cumulative_wait_store = []
-        self.avg_queue_length_store = []
-        self.training_epochs = training_epochs
+        self.Gamma = Gamma
+        self.Step = 0
+        self.Sumo = Sumo
+        self.MaxSteps = MaxSteps
+        self.GreenDuration = GreenDuration
+        self.YellowDuration = YellowDuration
+        self.NumStates = NumStates
+        self.NumActions = NumActions
+        self.RewardStore = []
+        self.TotalWaitStore = []
+        self.AverageQueueLengthStore = []
+        self.TrainingEpochs = TrainingEpochs
+    
+    # Runs an episode of simuation and then trains the model on the generated simulation
+    def RunTraining(self, episode, epsilon):
+        StartTime=timeit.default_timer()
+        
+        # Generate route file
+        self.Traffic.GenerateRoutefile(seed=episode)
+        
+        # Setting up Sumo
+        traci.start(self.Sumo)
+        
+        print("=====Simulating Cars=====")
+        
+        #initializations
+        self.Step=0
+        self.WaitingTimes={}
+        self.SumNegativeReward=0
+        self.SumQueueReward=0
+        self.SumWaitingTime=0
+        OldTotalWait=0
+        OldState=-1
+        OldAction=-1
+        
+        while self.Step<self.MaxSteps:
+            # Current State of the Junction
+            CurrentState=self.GetState()
+            
+            # Waiting time is the number of seconds that a car has waiting after being spawned into the env
+            # Here we will be getting the sum of all waiting times for the cars in all lanes
+            CurrentTotalWait=self.CollectWaitingTimes()
+            Reward=OldTotalWait-CurrentTotalWait
+            
+            # Save Data to Memory
+            if self.Step!=0:
+                self.Memory.AddSample((OldState,OldAction,Reward,CurrentState))
+            
+            # Choose an Action or Light Phase to activate based on the current state of the junction
+            Action=self.ChooseAction(CurrentState, epsilon)
+            
+            # If the chosen action/phase is different than the old one, change to yellow phase
+            if self.Step!=0 and OldAction!=Action:
+                self.SetYellowPhase(OldAction)
+                self.Simulate(self.YellowDuration)
+                
+            # Execute the chosen phase
+            self.SetGreenPhase(Action)
+            self.Simulate(self.GreenDuration)
+            
+            # Save Variables for next iteration and Collect Reward
+            OldState=CurrentState
+            OldAction=Action
+            OldTotalWait=CurrentTotalWait
+            
+            # Save only meaningful rewards to see if the agent is behaving to as planned
+            if Reward<0:
+                self.SumNegativeReward+=Reward
+                
+        self.SaveEpisodeStats()
+        print("Total Reward: ", self.SumNegativeReward, "| Epsilon: ", round(epsilon, 2))
+        traci.close()
+        SimulationTime=round(timeit.default_timer() - StartTime, 1)
+        
+        print("=====Training The Model=====")
+        StartTime=timeit.default_timer()
+        for _ in range(self.TrainingEpochs):
+            self.Replay()
+        TrainingTime=round(timeit.default_timer() - StartTime, 1)
+        
+        return SimulationTime, TrainingTime
+
+    # Gathers states while executing steps in sumo
+    def Simulate(self, StepsTodo):
+        if(self.Step+StepsTodo)>=self.MaxSteps:
+            StepsTodo=self.MaxSteps-self.Step
+            
+        while StepsTodo>0:
+            traci.simulationStep() # Simulate 1 step
+            self.Step+=1
+            StepsTodo-=1
+            QueueLength=self.GetQueueLength()
+            self.SumQueueLength+=QueueLength
+            self.SumWaitingTime+=QueueLength # 1 one step while waiting in queue
+
+    # Collect teh waiting time for every car in the Incoming Roads            
+    def CollectWaitingTimes(self):
+        IncomingRoads=["E_TL", "N_TL", "W_TL", "S_TL"]
+        CarList=traci.vehicle.getIDList()
+        for CarID in CarList:
+            WaitTime=traci.vehicle.getAccumulatedWaitingTime(CarID)
+            RoadID=traci.vehicle.getRoadID(CarID) # Get Road ID on which the vehicle is
+            if RoadID in IncomingRoads: # Considers only waiting time of cars in incoming roads
+                self.WaitingTimes[CarID]=WaitTime
+            else:
+                if CarID in self.WaitingTimes: # Car that was tracked and has now cleared the intersection
+                    del self.WaitingTimes[CarID]
+        TotalWaitingTime=sum(self.WaitingTimes.values())
+        
+        return TotalWaitingTime
+    
+    # Decide whether to explore or exploit, according to an epsilon-greedy policy
+    def ChooseAction(self, state, epsilon):
+        if random.random() < epsilon:
+            return random.randint(0, self.NumActions -1)
+        else:
+            return np.argmax(self.Model.PredictOne(state))
+
+    #        
+    def SetYellowPhase(self, OldAction):
+        YellowPhaseCode=OldAction*2+1
+        traci.trafficlight.setPhase("TL", YellowPhaseCode)
+
+    #        
+    def SetGreenPhase(self, ActionNumber):
+        if ActionNumber==0:
+            traci.trafficlight.setPhase("TL",NS_Green)
+        elif ActionNumber==1:
+            traci.trafficlight.setPhase("TL",NSL_Green)
+        elif ActionNumber==2:
+            traci.trafficlight.setPhase("TL",EW_Green)
+        elif ActionNumber==3:
+            traci.trafficlight.setPhase("TL",EWL_Green)
+
+    #        
+    def GetQueueLength(self):
+        HaltN=traci.edge.getLastStepHaltingNumber("N_TL")
+        HaltS=traci.edge.getLastStepHaltingNumber("S_TL")
+        HaltE=traci.edge.getLastStepHaltingNumber("E_TL")
+        HaltW=traci.edge.getLastStepHaltingNumber("W_TL")
+        QueueLength=HaltN+HaltE+HaltS+HaltW
+        
+        return QueueLength
+    
+    # Retrieves the state of the junction from sumo
+    def GetState(self):
+        pass
+    
+    # Retrieve a group of samples from memory and update the learning equation for each of them, then train the Nueral Network
+    def Replay(self):
+        Batch=self.Memory.GetSamples(self.Model.BatchSize)
+        if len(Batch)>0:
+            States=np.array([Val[0] for Val in Batch])
+            NextStates=np.array([Val[3] for Val in Batch])
+            
+            # Prediction
+            QSA=self.Model.PredictBatch(States)
+            QSAD=self.Model.PredictBatch(NextStates)
+            
+            # Setting up training arrays
+            x=np.zeros((len(Batch), self.NumStates))
+            y=np.zeros((len(Batch), self.NumActions))
+            
+            for i, b in enumerate(Batch):
+                State, Action, Reward, _=b[0], b[1], b[2], b[3]
+                CurrentQ=QSA[i]
+                CurrentQ[Action]=Reward+self.Gamma*np.amax(QSAD[i])
+                x[i]=State
+                y[i]=CurrentQ
+        
+        self.Model.TrainBatch(x,y)
+
+    # Save stats of the episode to plot
+    def SaveEpisodeStats(self):
+        self.RewardStore.append(self.SumNegativeReward)
+        self.TotalWaitStore.append(self.SumWaitingTime)
+        self.AverageQueueLengthStore.append(self.SumQueueReward / self.MaxSteps)
+    
+    @property
+    def RewardStore(self):
+        return self.RewardStore
+    
+    @property
+    def TotalWaitStore(self):
+        return self.TotalWaitStore
+    
+    @property
+    def AverageQueueLengthStore(self):
+        return self.AverageQueueLengthStore

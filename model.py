@@ -1,5 +1,6 @@
 import os
 os.environ['TF_CPP_MIN_LOG_LEVEL']='2'  # doesnt show any annoying tensorflow warnings
+import numpy as np
 
 from tensorflow import keras
 from keras import layers,losses
@@ -7,7 +8,7 @@ from keras.optimizers import Adam
 from keras.utils import plot_model
 from keras.models import load_model
 
-class Model:
+class TrainModel:
     # Basic class definition
     def __init__(self, NumLayers, width, BatchSize, LearningRate, InputDimension, OutputDimension, model=None):
         self.InputDimension = InputDimension
@@ -29,3 +30,18 @@ class Model:
         Model=keras.Model(inputs=Input,outputs=Output,name='MyModel')
         Model.compile(loss=losses.mean_squared_error,optimizer=Adam(LearningRate=self.LearningRate))
         return Model
+    
+    # Predicts Action Value from a single state
+    def PridictOne(self, state):
+        state=np.reshape(state, [1, self.InputDimension])
+        return self.model.predict(state)
+    
+    # Predicts Action Values from a Batch of States
+    def PredictBatch(self, states):
+        return self.model.predict(states)
+    
+    # Trains the Nueral Network using the updates Q-Values
+    def TrainBatch(self, states, qsa):
+        self.model.fit(states, qsa, epochs=1, verbrose=0)
+    
+    

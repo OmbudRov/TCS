@@ -1,11 +1,13 @@
-# Graphs and Stuff
+# Visualization
 import matplotlib.pyplot as plt
 import os
 
-#Traffic
+# TrafficGen
 import numpy as np
 import math
 
+# Memory
+import random
 
 class Visualization:
     def __init__(self,path,dpi):
@@ -32,7 +34,6 @@ class Visualization:
         with open(os.path.join(self.path,'plot_'+filename+'_data.txt'), "w") as file:
             for value in data:
                 file.write("%s\n"%value)
-
 
 class TrafficGen:
     def __init__(self, MaxSteps, N_Cars):
@@ -117,3 +118,30 @@ class TrafficGen:
                         print('    <vehicle id="SE_%i" type="Car" route="SE" depart="%s" departLane="random" departSpeed="10" />' % (cc,step), file=route)
             
             print("</routes>", file=route)
+            
+class Memory:
+    def __init__(self,SizeMax,SizeMin):
+        self.Samples=[]
+        self.SizeMax=SizeMax
+        self.SizeMin=SizeMin
+    
+    def AddSample(self,Sample):
+        self.Samples.append(Sample)
+        if self.SizeNow()>self.SizeMax:
+            # Removes oldest element when full
+            self.Samples.pop(0)
+    
+    def GetSamples(self, N):
+        if self.SizeNow()<self.SizeMin:
+            return []
+        
+        if N>self.SizeNow():
+            # Get all sampples
+            return random.sample(self.Samples,self.SizeNow())
+        else:
+            # Returns 'BatchSize'(or N, in this case) number of samples
+            return random.sample(self.Samples, N)
+    
+    def SizeNow(self):
+        # Returns number of elements in Samples or how 'full' the memory is
+        return len(self.Samples)
