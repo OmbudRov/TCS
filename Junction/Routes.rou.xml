@@ -1,6 +1,6 @@
 <route>
     <!-- Defining the Car -->
-    <vType accel="1",decel="4",id="Car",length="5",minGap="3",maxSpeed="30",sigma="0.5">
+    <vType accel="1",decel="4",id="Car",length="5",minGap="2.5",maxSpeed="30",sigma="0.5">
     
     <!-- Defining Routes From Northern Road -->
         <route id="NW" edges="N_TL TL_W"/>

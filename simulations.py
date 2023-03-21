@@ -137,12 +137,12 @@ class TrainingSimulation:
         else:
             return np.argmax(self.Model.PredictOne(state))
 
-    #        
+    # Activates the green correct green light combination
     def SetYellowPhase(self, OldAction):
         YellowPhaseCode=OldAction*2+1
         traci.trafficlight.setPhase("TL", YellowPhaseCode)
 
-    #        
+    # Activates the green correct green light combination
     def SetGreenPhase(self, ActionNumber):
         if ActionNumber==0:
             traci.trafficlight.setPhase("TL",NS_Green)
@@ -153,7 +153,7 @@ class TrainingSimulation:
         elif ActionNumber==3:
             traci.trafficlight.setPhase("TL",EWL_Green)
 
-    #        
+    # Get the number of cars with no speed in all the incoming lanes
     def GetQueueLength(self):
         HaltN=traci.edge.getLastStepHaltingNumber("N_TL")
         HaltS=traci.edge.getLastStepHaltingNumber("S_TL")
@@ -165,7 +165,70 @@ class TrainingSimulation:
     
     # Retrieves the state of the junction from sumo
     def GetState(self):
-        pass
+        State=np.zeros(self.NumStates)
+        CarList=traci.vehicle.getIDList()
+        
+        for CarID in CarList:
+            LanePosition=traci.vehicle.getLanePosition(CarID)
+            LaneID=traci.vehicle.getLaneID(CarID)
+            LanePosition=750-LanePosition # If the car is close to the traffic light
+            
+            # Distance from the Traffic Light being mapped into cells
+            if LanePosition < 7:
+                LaneCell = 0
+            elif LanePosition < 14:
+                LaneCell = 1
+            elif LanePosition < 21:
+                LaneCell = 2
+            elif LanePosition < 28:
+                LaneCell = 3
+            elif LanePosition < 40:
+                LaneCell = 4
+            elif LanePosition < 60:
+                LaneCell = 5
+            elif LanePosition < 100:
+                LaneCell = 6
+            elif LanePosition < 160:
+                LaneCell = 7
+            elif LanePosition < 200:
+                LaneCell = 8
+            elif LanePosition <= 300:
+                LaneCell = 9
+            
+            # Finding where the car is located
+            # Here W_TL_3, N_TL_3, E_TL_3, S_TL_3 are 'left-only' turns
+            if LaneID == "W_TL_0" or LaneID == "W_TL_1" or LaneID == "W_TL_2":
+                LaneGroup = 0
+            elif LaneID == "W_TL_3":
+                LaneGroup = 1
+            elif LaneID == "N_TL_0" or LaneID == "N_TL_1" or LaneID == "N_TL_2":
+                LaneGroup = 2
+            elif LaneID == "N_TL_3":
+                LaneGroup = 3
+            elif LaneID == "E_TL_0" or LaneID == "E_TL_1" or LaneID == "E_TL_2":
+                LaneGroup = 4
+            elif LaneID == "E2TL_3":
+                LaneGroup = 5
+            elif LaneID == "S_TL_0" or LaneID == "S2TL_1" or LaneID == "S_TL_2":
+                LaneGroup = 6
+            elif LaneID == "S_TL_3":
+                LaneGroup = 7
+            else:
+                LaneGroup = -1
+                
+            if LaneGroup>=1 and LaneGroup<=7:
+                CarPosition=int(str(LaneGroup)+str(LaneCell)) # Creates a number between 0 and 79
+                ValidCar=True
+            elif LaneGroup==0:
+                CarPosition=LaneCell
+                ValidCar=True
+            else:
+                ValidCar=False # Flag to make sure the cars crossing the intersection/driving away from the intersection arent detected
+            
+            if ValidCar:
+                State[CarPosition]=1 # Writes the position of the Car in the state array as 'cell occupied'
+        
+        return State
     
     # Retrieve a group of samples from memory and update the learning equation for each of them, then train the Nueral Network
     def Replay(self):
