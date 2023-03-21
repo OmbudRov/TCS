@@ -43,5 +43,9 @@ class TrainModel:
     # Trains the Nueral Network using the updates Q-Values
     def TrainBatch(self, states, qsa):
         self.model.fit(states, qsa, epochs=1, verbrose=0)
-    
+        
+    # Saves the current model in the given path as a .h5 file and a model architecture graph
+    def SaveModel(self, path):
+        self.model.save(os.path.join(path,'TrainedModel.h5'))
+        plot_model(self.model,to_file=os.path.join(path, 'ModelStructure.png'),show_shapes=True,show_layer_names=True)
     
