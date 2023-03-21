@@ -9,6 +9,10 @@ import math
 # Memory
 import random
 
+# SetSumo Function
+import sys
+from sumolib import checkBinary
+
 class Visualization:
     def __init__(self,path,dpi):
         self.path=path
@@ -145,3 +149,44 @@ class Memory:
     def SizeNow(self):
         # Returns number of elements in Samples or how 'full' the memory is
         return len(self.Samples)
+    
+#Configure the various parameters of SUMO
+def SetSumo(Gui, SumoCfgFileName,MaxSteps):
+    if 'SUMO_HOME' in os.environ:
+        Tools=os.path.join(os.environ['SUMO_HOME'], 'tools')
+        sys.path.append(Tools)
+    else:
+        sys.exit("Please Declare Environment Variable 'SUMO_HOME'")
+        
+    if Gui == False:
+        SumoBinary=checkBinary('sumo')
+    else:
+        SumoBinary=checkBinary('sumo-gui')
+    
+    # "sumoBinary" decides whether to use a GUI
+    # "-c" loads the named config on startup
+    # "os.path.join()" sets up the location of the sumo config file
+    # "--no-step-logging" disables console output of current simulation step
+    # "--waiting-time-memory" is the length of time interval, over which accumulated waiting time is taken into account
+    # "str()" sets the maximum amount of steps allowed in the simulation
+    SumoCmd=[SumoBinary,"-c",os.path.join('Junction',SumoCfgFileName),"--no-step-log","true","--waiting-time-memory",str(MaxSteps)]
+    
+    return SumoCmd
+
+#Setting up the Directory for trained models and incrementally increase a variable to different models
+def SetTrainPath(ModelPathName):
+    ModelPath=os.path.join(os.getcwd,ModelPathName,'')
+    os.makedirs(os.path.dirname(ModelPath),exist_ok=True)
+    
+    Contents=os.listdir(ModelPath)
+    if Contents:
+        PreviousVersions=[int(Name.split(" ")) for Name in Contents]
+        NewVersion=str(max(PreviousVersions)+1)
+    else:
+        NewVersion=1
+    
+    DataPath=os.path.join(ModelPath,'Model '+NewVersion,'')
+    os.makedirs(os.path.dirname(DataPath),exist_ok=True)
+    
+    return DataPath
+

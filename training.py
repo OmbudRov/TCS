@@ -7,7 +7,7 @@ import datetime
 import time
 
 from model import TrainModel
-from utilities import Visualization, TrafficGen, Memory
+from utilities import SetSumo, SetTrainPath, Visualization, TrafficGen, Memory
 from simulations import TrainingSimulation
 
 from sumolib import checkBinary
@@ -46,35 +46,11 @@ if __name__ == "__main__":
     args=parse_args()
     
     #Setting up cmd command to run sumo during simulation
-    if 'SUMO_HOME' in os.environ:
-        tools=os.path.join(os.environ['SUMO_HOME'],'tools')
-        sys.path.append(tools)
-    else:
-        sys.exit("'SUMO_HOME' does not exist")
-    if args.Gui == True:
-        sumoBinary=checkBinary('sumo')
-    else:
-        sumoBinary=checkBinary('sumo-gui')
-    # "sumoBinary" decides whether to use a GUI
-    # "-c" loads the named config on startup
-    # "os.path.join()" sets up the location of the sumo config file
-    # "--no-step-logging" disables console output of current simulation step
-    # "--waiting-time-memory" is the length of time interval, over which accumulated waiting time is taken into account
-    # "str()" sets the maximum amount of steps allowed in the simulation
-    SumoCmd=[sumoBinary,"-c",os.path.join('Junction','Config.sumocfg'),"--no-step-logging","--waiting-time-memory",str(args.MaxSteps)]  
+    SumoCmd=SetSumo(args.Gui,"Config.sumocfg",args.MaxSteps)
     
-    #Setting up the Directory for trained models
-    ModelPath=os.path.join(os.getcwd(),"Models",'')
-    os.makedirs(os.path.dirname(ModelPath),exist_ok=True) #Makes a Directory called "Models" if it already doesnt exist
-    Dir=os.listdir(ModelPath)
-    if Dir:
-        versions=[int(name.split("_")[1]) for name in Dir]
-        new_verion=str(max(versions)+1)
-    else:
-        new_verion='1'
-    DataPath=os.path.join(ModelPath,'Model_'+new_verion,'')
-    os.makedirs(os.path.dirname(DataPath),exist_ok=True) #Makes a Directory for the current model being trained
-    
+    # Setting up the Model Directory
+    DataPath=SetTrainPath("Models")
+       
     Episode=0
     StartTimeStamp=datetime.datetime.now() # To Show the starting time when the program is done executing
     if(args.Mode=='normal'):
