@@ -1,6 +1,7 @@
 import os
 os.environ['TF_CPP_MIN_LOG_LEVEL']='2'  # doesnt show any annoying tensorflow warnings
 import numpy as np
+import sys
 
 from tensorflow import keras
 from keras import layers,losses
@@ -49,3 +50,21 @@ class TrainModel:
         self.model.save(os.path.join(path,'TrainedModel.h5'))
         plot_model(self.model,to_file=os.path.join(path, 'ModelStructure.png'),show_shapes=True,show_layer_names=True)
     
+class TestModel:
+    def __init__(self, InputDimension, ModelPath):
+        self.InputDimension=InputDimension
+        self.Model=self.LoadModel(ModelPath)
+        
+    def LoadModel(self, ModelFolderPath):
+        ModelFilePath=os.path.join(ModelFolderPath, 'TrainedModel.h5')
+        
+        if os.path.isfile(ModelFilePath):
+            LoadedModel=load_model(ModelFilePath)
+            return LoadedModel
+        else:
+            sys.exit("Model Does Not Exist")
+    
+    # Predicts Action Value from a single state
+    def PredictOne(self, state):
+        state=np.reshape(state, [1, self.InputDimension])
+        return self.model.predict(state)
