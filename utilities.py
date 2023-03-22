@@ -187,3 +187,12 @@ def SetTrainPath(ModelPathName):
     return DataPath
 
 # Setting up the path from which a trained model is taken
+def SetTestPath(ModelNumber):
+    ModelPath=os.path.join(os.getcwd(),"Models",'Model_'+str(ModelNumber),'')
+    
+    if os.path.isdir(ModelPath):
+        PlotPath=os.path.join(ModelPath,'Testing','')
+        os.makedirs(os.path.dirname(PlotPath),exist_ok=True)
+        return ModelPath,PlotPath
+    else:
+        sys.exit('The Specified Model Doesnt Exist')

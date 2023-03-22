@@ -260,14 +260,5 @@ class TrainingSimulation:
         self.TotalWaitStore.append(self.SumWaitingTime)
         self.AverageQueueLengthStore.append(self.SumQueueReward / self.MaxSteps)
     
-    @property
-    def Reward_Store(self):
-        return self.Reward_Store
-    
-    @property
-    def TotalWait_Store(self):
-        return self.TotalWait_Store
-    
-    @property
-    def AverageQueueLength_Store(self):
-        return self.AverageQueueLength_Store
+class TestingSimulation:
+    pass
