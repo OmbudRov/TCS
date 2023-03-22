@@ -37,7 +37,7 @@ class TrainingSimulation:
         StartTime=timeit.default_timer()
         
         # Generate route file
-        self.Traffic.GenerateRoutefile(seed=episode)
+        self.Traffic.GenerateRoutes(seed=episode)
         
         # Setting up Sumo
         traci.start(self.Sumo)
@@ -111,12 +111,12 @@ class TrainingSimulation:
             self.Step+=1
             StepsTodo-=1
             QueueLength=self.GetQueueLength()
-            self.SumQueueLength+=QueueLength
+            self.SumQueueReward+=QueueLength
             self.SumWaitingTime+=QueueLength # 1 one step while waiting in queue
 
     # Collect teh waiting time for every car in the Incoming Roads            
     def CollectWaitingTimes(self):
-        IncomingRoads=["E_TL", "N_TL", "W_TL", "S_TL"]
+        IncomingRoads=["E2TL", "N2TL", "W2TL", "S2TL"]
         CarList=traci.vehicle.getIDList()
         for CarID in CarList:
             WaitTime=traci.vehicle.getAccumulatedWaitingTime(CarID)
@@ -155,10 +155,10 @@ class TrainingSimulation:
 
     # Get the number of cars with no speed in all the incoming lanes
     def GetQueueLength(self):
-        HaltN=traci.edge.getLastStepHaltingNumber("N_TL")
-        HaltS=traci.edge.getLastStepHaltingNumber("S_TL")
-        HaltE=traci.edge.getLastStepHaltingNumber("E_TL")
-        HaltW=traci.edge.getLastStepHaltingNumber("W_TL")
+        HaltN=traci.edge.getLastStepHaltingNumber("N2TL")
+        HaltS=traci.edge.getLastStepHaltingNumber("S2TL")
+        HaltE=traci.edge.getLastStepHaltingNumber("E2TL")
+        HaltW=traci.edge.getLastStepHaltingNumber("W2TL")
         QueueLength=HaltN+HaltE+HaltS+HaltW
         
         return QueueLength
@@ -190,28 +190,28 @@ class TrainingSimulation:
                 LaneCell = 6
             elif LanePosition < 160:
                 LaneCell = 7
-            elif LanePosition < 200:
+            elif LanePosition < 400:
                 LaneCell = 8
-            elif LanePosition <= 300:
+            elif LanePosition <= 750:
                 LaneCell = 9
             
             # Finding where the car is located
-            # Here W_TL_3, N_TL_3, E_TL_3, S_TL_3 are 'left-only' turns
-            if LaneID == "W_TL_0" or LaneID == "W_TL_1" or LaneID == "W_TL_2":
+            # Here W2TL_3, N2TL_3, E2TL_3, S2TL_3 are 'left-only' turns
+            if LaneID == "W2TL_0" or LaneID == "W2TL_1" or LaneID == "W2TL_2":
                 LaneGroup = 0
-            elif LaneID == "W_TL_3":
+            elif LaneID == "W2TL_3":
                 LaneGroup = 1
-            elif LaneID == "N_TL_0" or LaneID == "N_TL_1" or LaneID == "N_TL_2":
+            elif LaneID == "N2TL_0" or LaneID == "N2TL_1" or LaneID == "N2TL_2":
                 LaneGroup = 2
-            elif LaneID == "N_TL_3":
+            elif LaneID == "N2TL_3":
                 LaneGroup = 3
-            elif LaneID == "E_TL_0" or LaneID == "E_TL_1" or LaneID == "E_TL_2":
+            elif LaneID == "E2TL_0" or LaneID == "E2TL_1" or LaneID == "E2TL_2":
                 LaneGroup = 4
             elif LaneID == "E2TL_3":
                 LaneGroup = 5
-            elif LaneID == "S_TL_0" or LaneID == "S2TL_1" or LaneID == "S_TL_2":
+            elif LaneID == "S2TL_0" or LaneID == "S2TL_1" or LaneID == "S2TL_2":
                 LaneGroup = 6
-            elif LaneID == "S_TL_3":
+            elif LaneID == "S2TL_3":
                 LaneGroup = 7
             else:
                 LaneGroup = -1
@@ -261,13 +261,13 @@ class TrainingSimulation:
         self.AverageQueueLengthStore.append(self.SumQueueReward / self.MaxSteps)
     
     @property
-    def RewardStore(self):
-        return self.RewardStore
+    def Reward_Store(self):
+        return self.Reward_Store
     
     @property
-    def TotalWaitStore(self):
-        return self.TotalWaitStore
+    def TotalWait_Store(self):
+        return self.TotalWait_Store
     
     @property
-    def AverageQueueLengthStore(self):
-        return self.AverageQueueLengthStore
+    def AverageQueueLength_Store(self):
+        return self.AverageQueueLength_Store
