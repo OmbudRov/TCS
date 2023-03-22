@@ -19,8 +19,8 @@ class Visualization:
         self.dpi=dpi # Resolution in "Dots Per Inch"
         
     def DataAndPlot(self, data, filename, xlabel, ylabel):
-        min=min(data)
-        max=max(data)
+        Min=min(data)
+        Max=max(data)
         
         plt.rcParams.update({'font.size':20})
         
@@ -28,7 +28,7 @@ class Visualization:
         plt.xlabel(xlabel)
         plt.ylabel(ylabel)
         plt.margins(0)
-        plt.ylim(min-0.05*abs(min), max+0.05*abs(max))
+        plt.ylim(Min-0.05*abs(Min), Max+0.05*abs(Max))
         
         figure=plt.gcf()
         figure.set_size_inches(20,12)
@@ -67,59 +67,55 @@ class TrafficGen:
         
         
         # Make the file for car generation, each new line represents a new car
-        with open("Junction/Routes.rou.xml", "w") as route:
+        with open("Junction/EpisodeRoutes.rou.xml", "w") as route:
             print("""<routes>
-            <!-- Defining the Car -->
-            <vType accel="1",decel="4",id="Car",length="5",minGap="3",maxSpeed="30",sigma="0.5">
-            
-            <!-- Defining Routes From Northern Road -->
-                <route id="NW" edges="N_TL TL_W"/>
-                <route id="NE" edges="N_TL TL_E"/>
-                <route id="NS" edges="N_TL TL_S"/>
-            <!-- Defining Routes From Southern Road -->
-                <route id="SW" edges="S_TL TL_W"/>
-                <route id="SN" edges="S_TL TL_N"/>
-                <route id="SE" edges="S_TL TL_E"/>
-            <!-- Defining Routes From Eastern Road -->
-                <route id="EW" edges="E_TL TL_W"/>
-                <route id="EN" edges="E_TL TL_N"/>
-                <route id="ES" edges="E_TL TL_S"/>
-            <!-- Defining Routes From Western Road -->
-                <route id="WN" edges="W_TL TL_N"/>
-                <route id="WE" edges="W_TL TL_E"/>
-                <route id="WS" edges="W_TL TL_S"/>""",file=route)
+            <vType accel="1.0" decel="4.5" id="Car" length="5.0" minGap="2.5" maxSpeed="25" sigma="0.5" />
+
+            <route id="W_N" edges="W2TL TL2N"/>
+            <route id="W_E" edges="W2TL TL2E"/>
+            <route id="W_S" edges="W2TL TL2S"/>
+            <route id="N_W" edges="N2TL TL2W"/>
+            <route id="N_E" edges="N2TL TL2E"/>
+            <route id="N_S" edges="N2TL TL2S"/>
+            <route id="E_W" edges="E2TL TL2W"/>
+            <route id="E_N" edges="E2TL TL2N"/>
+            <route id="E_S" edges="E2TL TL2S"/>
+            <route id="S_W" edges="S2TL TL2W"/>
+            <route id="S_N" edges="S2TL TL2N"/>
+            <route id="S_E" edges="S2TL TL2E"/>""", file=route)
+
             
             for cc,step in enumerate(CarGen):
                 StraightOrTurn = np.random.uniform()
                 if StraightOrTurn < 0.73: # Cars go straight 73% of the time
                     rs=np.random.randint(1,5) # Helps choose which straight route a car should take
                     if rs==1:
-                        print('    <vehicle id="WE_%i" type="Car" route="WE" depart="%s" departLane="random" departSpeed="10" />' % (cc,step), file=route)
+                        print('    <vehicle id="W_E_%i" type="Car" route="W_E" depart="%s" departLane="random" departSpeed="10" />' % (cc, step), file=route)
                     elif rs ==2:
-                        print('    <vehicle id="EW_%i" type="Car" route="EW" depart="%s" departLane="random" departSpeed="10" />' % (cc,step), file=route)
+                        print('    <vehicle id="E_W_%i" type="Car" route="E_W" depart="%s" departLane="random" departSpeed="10" />' % (cc,step), file=route)
                     elif rs ==3:
-                        print('    <vehicle id="NS_%i" type="Car" route="NS" depart="%s" departLane="random" departSpeed="10" />' % (cc,step), file=route)
+                        print('    <vehicle id="N_S_%i" type="Car" route="N_S" depart="%s" departLane="random" departSpeed="10" />' % (cc,step), file=route)
                     else:
-                        print('    <vehicle id="SN_%i" type="Car" route="SN" depart="%s" departLane="random" departSpeed="10" />' % (cc,step), file=route)
+                        print('    <vehicle id="S_N_%i" type="Car" route="S_N" depart="%s" departLane="random" departSpeed="10" />' % (cc,step), file=route)
                         
                 else: # Cars that take turns for the other 27% of the time
                     rt=np.random.randint(1,9) # Helps choose which route that has a turn a car should take
                     if rt==1:
-                        print('    <vehicle id="WN_%i" type="Car" route="WN" depart="%s" departLane="random" departSpeed="10" />' % (cc,step), file=route)
+                        print('    <vehicle id="W_N_%i" type="Car" route="W_N" depart="%s" departLane="random" departSpeed="10" />' % (cc,step), file=route)
                     elif rt ==2:
-                        print('    <vehicle id="WS_%i" type="Car" route="WS" depart="%s" departLane="random" departSpeed="10" />' % (cc,step), file=route)                        
+                        print('    <vehicle id="W_S_%i" type="Car" route="W_S" depart="%s" departLane="random" departSpeed="10" />' % (cc,step), file=route)                        
                     elif rt ==3:
-                        print('    <vehicle id="NW_%i" type="Car" route="NW" depart="%s" departLane="random" departSpeed="10" />' % (cc,step), file=route)
+                        print('    <vehicle id="N_W_%i" type="Car" route="N_W" depart="%s" departLane="random" departSpeed="10" />' % (cc,step), file=route)
                     elif rt ==4:
-                        print('    <vehicle id="NE_%i" type="Car" route="NE" depart="%s" departLane="random" departSpeed="10" />' % (cc,step), file=route)
+                        print('    <vehicle id="N_E_%i" type="Car" route="N_E" depart="%s" departLane="random" departSpeed="10" />' % (cc,step), file=route)
                     elif rt ==5:
-                        print('    <vehicle id="EN_%i" type="Car" route="EN" depart="%s" departLane="random" departSpeed="10" />' % (cc,step), file=route)
+                        print('    <vehicle id="E_N_%i" type="Car" route="E_N" depart="%s" departLane="random" departSpeed="10" />' % (cc,step), file=route)
                     elif rt ==6:
-                        print('    <vehicle id="ES_%i" type="Car" route="ES" depart="%s" departLane="random" departSpeed="10" />' % (cc,step), file=route)
+                        print('    <vehicle id="E_S_%i" type="Car" route="E_S" depart="%s" departLane="random" departSpeed="10" />' % (cc,step), file=route)
                     elif rt ==7:
-                        print('    <vehicle id="SW_%i" type="Car" route="SW" depart="%s" departLane="random" departSpeed="10" />' % (cc,step), file=route)
+                        print('    <vehicle id="S_W_%i" type="Car" route="S_W" depart="%s" departLane="random" departSpeed="10" />' % (cc,step), file=route)
                     elif rt ==8:
-                        print('    <vehicle id="SE_%i" type="Car" route="SE" depart="%s" departLane="random" departSpeed="10" />' % (cc,step), file=route)
+                        print('    <vehicle id="S_E_%i" type="Car" route="S_E" depart="%s" departLane="random" departSpeed="10" />' % (cc,step), file=route)
             
             print("</routes>", file=route)
             
@@ -173,20 +169,21 @@ def SetSumo(Gui, SumoCfgFileName,MaxSteps):
     
     return SumoCmd
 
-#Setting up the Directory for trained models and incrementally increase a variable to different models
+# Setting up the Directory for trained models and incrementally increase a variable to different models
 def SetTrainPath(ModelPathName):
-    ModelPath=os.path.join(os.getcwd,ModelPathName,'')
+    ModelPath=os.path.join(os.getcwd(),ModelPathName,'')
     os.makedirs(os.path.dirname(ModelPath),exist_ok=True)
     
     Contents=os.listdir(ModelPath)
     if Contents:
-        PreviousVersions=[int(Name.split(" ")) for Name in Contents]
+        PreviousVersions=[int(Name.split("_")[1]) for Name in Contents]
         NewVersion=str(max(PreviousVersions)+1)
     else:
         NewVersion=1
     
-    DataPath=os.path.join(ModelPath,'Model '+NewVersion,'')
+    DataPath=os.path.join(ModelPath,'Model_'+str(NewVersion),'')
     os.makedirs(os.path.dirname(DataPath),exist_ok=True)
     
     return DataPath
 
+# Setting up the path from which a trained model is taken
