@@ -18,7 +18,7 @@ def parse_args() -> argparse.Namespace:
     # Misc arguments
     Parser.add_argument('--Mode',help='Choose between making a new model and working further on an existing model',choices=['normal','retraining'],default='normal')
     Parser.add_argument('--Gui',help='GUI display option',type=bool,default=False)
-    Parser.add_argument('--TotalEpisodes',help='Total Number of Episodes to train the model on',default=10)
+    Parser.add_argument('--TotalEpisodes',help='Total Number of Episodes to train the model on',type=int,default=10)
     Parser.add_argument('--MaxSteps',help='Max Number of steps that can be taken',type=int,default=5400)
     Parser.add_argument('--N_Cars',help='Number of cars to be generated in each episode',type=int,default=1000)
     Parser.add_argument('--SaveSteps', help='Saves the model after every 5 episodes', action='store_true')
@@ -46,7 +46,7 @@ if __name__ == "__main__":
     args=parse_args()
     
     #Setting up cmd command to run sumo during simulation
-    SumoCmd=SetSumo(args.Gui,"Config.sumocfg",args.MaxSteps)
+    SumoCmd=SetSumo(args.Gui,"SumoConfig.sumocfg",args.MaxSteps)
     
     # Setting up the Model Directory
     DataPath=SetTrainPath("Models")
