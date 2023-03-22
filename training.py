@@ -22,6 +22,7 @@ def parse_args() -> argparse.Namespace:
     Parser.add_argument('--MaxSteps',help='Max Number of steps that can be taken',type=int,default=5400)
     Parser.add_argument('--N_Cars',help='Number of cars to be generated in each episode',type=int,default=1000)
     Parser.add_argument('--SaveSteps', help='Saves the model after every 5 episodes', action='store_true')
+    
     # Model arguments
     Parser.add_argument('--NumLayers',help='Number of Layers in the Nueral Network',type=int,default=5)
     Parser.add_argument('--LayerWidth',help='Dimensionality of the Output Space',type=int,default=400)
@@ -36,6 +37,8 @@ def parse_args() -> argparse.Namespace:
     # Memory arguments
     Parser.add_argument('--MaxMemorySize',help='Maximum Size of Memory',type=int,default=50000)
     Parser.add_argument('--MinMemorySize',help='Maximum Size of Memory',type=int,default=600)
+    
+    # Training Simulation arguments
     Parser.add_argument('--GreenDuration',help='Duration in seconds for the traffic light to remain green',type=int,default=10)
     Parser.add_argument('--YellowDuration',help='Duration in seconds for the traffic light to remain green',type=int,default=4)
     Parser.add_argument('--TrainingEpochs',type=int,default=800)
