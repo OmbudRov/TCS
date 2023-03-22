@@ -28,11 +28,11 @@ class TrainModel:
             Output=layers.Dense(width, activation='relu')(Output)
         Output=layers.Dense(self.OutputDimension,activation='linear')(Output)
         Model=keras.Model(inputs=Input,outputs=Output,name='MyModel')
-        Model.compile(loss=losses.mean_squared_error,optimizer=Adam(LearningRate=self.LearningRate))
+        Model.compile(loss=losses.mean_squared_error,optimizer=Adam(learning_rate=self.LearningRate))
         return Model
     
     # Predicts Action Value from a single state
-    def PridictOne(self, state):
+    def PredictOne(self, state):
         state=np.reshape(state, [1, self.InputDimension])
         return self.model.predict(state)
     
@@ -42,7 +42,7 @@ class TrainModel:
     
     # Trains the Nueral Network using the updates Q-Values
     def TrainBatch(self, states, qsa):
-        self.model.fit(states, qsa, epochs=1, verbrose=0)
+        self.model.fit(states, qsa, epochs=1, verbose=0)
         
     # Saves the current model in the given path as a .h5 file and a model architecture graph
     def SaveModel(self, path):
