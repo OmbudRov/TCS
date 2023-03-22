@@ -237,7 +237,7 @@ class TrainingSimulation:
             States=np.array([Val[0] for Val in Batch])
             NextStates=np.array([Val[3] for Val in Batch])
             
-            # Prediction
+            # Predictions of Q(State) and Q(NextState) for every sample
             QSA=self.Model.PredictBatch(States)
             QSAD=self.Model.PredictBatch(NextStates)
             
@@ -248,11 +248,11 @@ class TrainingSimulation:
             for i, b in enumerate(Batch):
                 State, Action, Reward, _=b[0], b[1], b[2], b[3]
                 CurrentQ=QSA[i]
-                CurrentQ[Action]=Reward+self.Gamma*np.amax(QSAD[i])
+                CurrentQ[Action]=Reward+self.Gamma*np.amax(QSAD[i]) # Updates Q(State,Action)
                 x[i]=State
                 y[i]=CurrentQ
         
-        self.Model.TrainBatch(x,y)
+            self.Model.TrainBatch(x,y)
 
     # Save stats of the episode to plot
     def SaveEpisodeStats(self):
