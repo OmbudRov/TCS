@@ -6,6 +6,7 @@ import argparse
 
 from utilities import SetSumo,SetTestPath,TrafficGen,Visualization
 from model import TestModel
+from simulations import TestingSimulation
 
 def parse_args() -> argparse.Namespace:
     # Takes arguments from command line
@@ -41,4 +42,13 @@ if __name__=="__main__":
     TestModel=TestModel(args.NumStates,ModelPath)
     TrafficGen=TrafficGen(args.MaxSteps,args.N_Cars)
     Visualization=Visualization(PlotPath,args.dpi)
+    TestingSimulation=TestingSimulation(TestModel,TrafficGen,args.MaxSteps,args.GreenDuration,args.YellowDuration,args.NumStates,args.NumActions)
+    
+    print('\n=============== Testing Episode ===============')
+    SimulationTime=TestingSimulation.RunTesting(1000)
+    print('Simulation Time:',SimulationTime,'Seconds')
+    print("Model Testing Info is saved at:",PlotPath)
+    
+    Visualization.DataAndPlot(data=TestingSimulation.EpisodeReward, filename='Reward',xlabel='Action Step',ylabel='Reward')
+    Visualization.DataAndPlot(data=TestingSimulation.EpisodeQueueLength, filename='Queue',xlabel='Step',ylabel='Queue Length (In Vehicles)')
     
