@@ -83,7 +83,7 @@ if __name__ == "__main__":
             print('=============================================')
             Episode+=1
             
-            if(args.SaveSteps and Episode%5==0):
+            if(args.SaveSteps and Episode%5==0 and Episode!=args.TotalEpisodes):
                 Model.SaveModel(DataPath+"Episode "+str(Episode))
                 print("Model Info is saved at:",DataPath+"Episode "+str(Episode))
                 print("Pausing the Training for 10 Minutes")
