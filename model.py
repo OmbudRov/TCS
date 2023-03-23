@@ -67,4 +67,4 @@ class TestModel:
     # Predicts Action Value from a single state
     def PredictOne(self, state):
         state=np.reshape(state, [1, self.InputDimension])
-        return self.model.predict(state)
+        return self.Model.predict(state)

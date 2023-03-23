@@ -37,12 +37,12 @@ if __name__=="__main__":
     # Setting up cmd command to run sumo during simulation
     SumoCmd=SetSumo(True,"SumoConfig.sumocfg",args.MaxSteps)
     # Setting up the path of the Model to be tested
-    ModelPath,PlotPath=SetTestPath("Models",args.ModelNumber)
+    ModelPath,PlotPath=SetTestPath(args.ModelNumber)
     
     TestModel=TestModel(args.NumStates,ModelPath)
     TrafficGen=TrafficGen(args.MaxSteps,args.N_Cars)
     Visualization=Visualization(PlotPath,args.dpi)
-    TestingSimulation=TestingSimulation(TestModel,TrafficGen,args.MaxSteps,args.GreenDuration,args.YellowDuration,args.NumStates,args.NumActions)
+    TestingSimulation=TestingSimulation(TestModel,TrafficGen,SumoCmd,args.MaxSteps,args.GreenDuration,args.YellowDuration,args.NumStates,args.NumActions)
     
     print('\n=============== Testing Episode ===============')
     SimulationTime=TestingSimulation.RunTesting(1000)
