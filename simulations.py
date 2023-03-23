@@ -114,7 +114,7 @@ class TrainingSimulation:
             self.SumQueueReward+=QueueLength
             self.SumWaitingTime+=QueueLength # 1 one step while waiting in queue
 
-    # Collect teh waiting time for every car in the Incoming Roads            
+    # Collect the waiting time for every car in the Incoming Roads            
     def CollectWaitingTimes(self):
         IncomingRoads=["E2TL", "N2TL", "W2TL", "S2TL"]
         CarList=traci.vehicle.getIDList()
@@ -261,4 +261,176 @@ class TrainingSimulation:
         self.AverageQueueLengthStore.append(self.SumQueueReward / self.MaxSteps)
     
 class TestingSimulation:
-    pass
+    # Basic Class Definition
+    def __init__(self, Model, Traffic, Sumo, MaxSteps, GreenDuration, YellowDuration, NumStates, NumActions):
+        self.Model=Model
+        self.Traffic=Traffic
+        self.Step=0
+        self.Sumo=Sumo
+        self.MaxSteps=MaxSteps
+        self.GreenDuration=GreenDuration
+        self.YellowDuration=YellowDuration
+        self.NumStates=NumStates
+        self.NumActions=NumActions
+        self.EpisodeReward=[]
+        self.EpisodeQueueLength=[]
+
+    # Runs the testing simulation        
+    def RunTesting(self, episode):
+        StartTime=timeit.default_timer()
+        
+        self.Traffic.GenerateRoutes(seed=episode)
+        traci.start(self.Sumo)
+        print("=====Testing Cars=====")
+        
+        # Initialisations
+        self.Step=0
+        self.WaitingTimes={}
+        OldWaitTime=0
+        OldAction=-1 # Arbitrary Initialisation
+        
+        while self.Step<self.MaxSteps:
+            CurrentState=self.GetState()
+            CurrentTotalWait=self.CollectWaitingTimes()
+            Reward=OldWaitTime-CurrentTotalWait
+            
+            Action=self.ChooseAction(CurrentState)
+            
+            if self.Step!=0 and OldAction!=Action:
+                self.SetYellowPhase(OldAction)
+                self.Simulate(self.YellowDuration)
+            
+            self.SetGreenPhase(Action)
+            self.Simulate(self.GreenDuration)
+            
+            OldAction=Action
+            OldWaitTime=CurrentTotalWait
+            self.EpisodeReward.append(Reward)
+            
+        traci.close()
+        SimulationTime=round(timeit.default_timer()-StartTime, 1)
+        
+        return SimulationTime
+
+    # Proceed with the simulation in Sumo            
+    def Simulate(self, StepsToDo):
+        if (self.Step+StepsToDo)>=self.MaxSteps:
+            StepsToDo=self.MaxSteps-self.Step
+        
+        while StepsToDo>0:
+            traci.simulationStep()
+            self.Step+=1
+            StepsToDo-=1
+            QueueLength=self.GetQueueLength()
+            self.EpisodeQueueLength.append(QueueLength)
+
+    # Collect the waiting time for every car in the Incoming Roads            
+    def CollectWaitingTimes(self):
+        IncomingRoads=["E2TL", "N2TL", "W2TL", "S2TL"]
+        CarList=traci.vehicle.getIDList()
+        for CarID in CarList:
+            WaitTime=traci.vehicle.getAccumulatedWaitingTime(CarID)
+            RoadID=traci.vehicle.getRoadID(CarID) # Get Road ID on which the vehicle is
+            if RoadID in IncomingRoads: # Considers only waiting time of cars in incoming roads
+                self.WaitingTimes[CarID]=WaitTime
+            else:
+                if CarID in self.WaitingTimes: # Car that was tracked and has now cleared the intersection
+                    del self.WaitingTimes[CarID]
+        TotalWaitingTime=sum(self.WaitingTimes.values())
+        
+        return TotalWaitingTime
+
+    # Picks the best action based on the current state of the environment            
+    def ChooseAction(self,state):
+        return np.argmax(self.Model.PredictOne(state))
+
+    # Activates the green correct green light combination
+    def SetYellowPhase(self, OldAction):
+        YellowPhaseCode=OldAction*2+1
+        traci.trafficlight.setPhase("TL", YellowPhaseCode)    
+
+    # Activates the green correct green light combination
+    def SetGreenPhase(self,ActionNumber):
+        if ActionNumber==0:
+            traci.trafficlight.setPhase("TL", NS_Green)
+        elif ActionNumber==1:
+            traci.trafficlight.setPhase("TL",NSL_Green)
+        elif ActionNumber==2:
+            traci.trafficlight.setPhase("TL",EW_Green)
+        elif ActionNumber==3:
+            traci.trafficlight.setPhase("TL",EWL_Green)
+
+    # Get the number of cars with no speed in all the incoming lanes
+    def GetQueueLength(self):
+        HaltN=traci.edge.getLastStepHaltingNumber("N2TL")
+        HaltS=traci.edge.getLastStepHaltingNumber("S2TL")
+        HaltE=traci.edge.getLastStepHaltingNumber("E2TL")
+        HaltW=traci.edge.getLastStepHaltingNumber("W2TL")
+        
+        QueueLength=HaltN+HaltS+HaltE+HaltW
+        return QueueLength
+
+    # Retrieves the state of the junction from sumo              
+    def GetState(self):
+        State=np.zeros(self.NumStates)
+        CarList=traci.vehicle.getIDList()
+        
+        for CarID in CarList:
+            LanePosition=traci.vehicle.getLanePosition(CarID)
+            LaneID=traci.vehicle.getLaneID(CarID)
+            LanePosition=750-LanePosition
+            
+            if LanePosition<7:
+                LaneCell=0
+            elif LanePosition<14:
+                LaneCell=1
+            elif LanePosition<21:
+                LaneCell=2
+            elif LanePosition<28:
+                LaneCell=3
+            elif LanePosition<40:
+                LaneCell=4
+            elif LanePosition<60:
+                LaneCell=5
+            elif LanePosition<100:
+                LaneCell=6
+            elif LanePosition<160:
+                LaneCell=7
+            elif LanePosition<400:
+                LaneCell=8
+            elif LanePosition<750:
+                LaneCell=9
+            
+            # Any lanes ending with 3 are the "Turn Left Only" Lanes
+            if LaneID == "W2TL_0" or LaneID == "W2TL_1" or LaneID == "W2TL_2":
+                LaneGroup = 0
+            elif LaneID == "W2TL_3":
+                LaneGroup = 1
+            elif LaneID == "N2TL_0" or LaneID == "N2TL_1" or LaneID == "N2TL_2":
+                LaneGroup = 2
+            elif LaneID == "N2TL_3":
+                LaneGroup = 3
+            elif LaneID == "E2TL_0" or LaneID == "E2TL_1" or LaneID == "E2TL_2":
+                LaneGroup = 4
+            elif LaneID == "E2TL_3":
+                LaneGroup = 5
+            elif LaneID == "S2TL_0" or LaneID == "S2TL_1" or LaneID == "S2TL_2":
+                LaneGroup = 6
+            elif LaneID == "S2TL_3":
+                LaneGroup = 7
+            else:
+                LaneGroup = -1
+                
+            if LaneGroup >= 1 and LaneGroup <= 7:
+                CarPosition = int(str(LaneGroup) + str(LaneCell))  # composition of the two postion ID to create a number in interval 0-79
+                ValidCar = True
+            elif LaneGroup == 0:
+                CarPosition = LaneCell
+                ValidCar = True
+            else:
+                ValidCar = False  # Doesnt detect cars crossing the intersection or driving away from it
+
+            if ValidCar:
+                State[CarPosition]=1
+        
+        return State
