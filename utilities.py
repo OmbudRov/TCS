@@ -13,6 +13,9 @@ import random
 import sys
 from sumolib import checkBinary
 
+# ImportSettings Function
+import configparser
+
 class Visualization:
     def __init__(self,path,dpi):
         self.path=path
@@ -196,3 +199,23 @@ def SetTestPath(ModelNumber):
         return ModelPath,PlotPath
     else:
         sys.exit('The Specified Model Doesnt Exist')
+        
+# Read Settings.ini
+def ImportSettings(ConfigFile):
+    Content=configparser.ConfigParser()
+    Content.read(ConfigFile)
+    Config={}
+    
+    Config['gui']=Content['Misc'].getboolean('gui')
+    Config['maxsteps']=Content['Misc'].getint('maxsteps')
+    Config['n_cars']=Content['Misc'].getint('n_cars')
+    
+    Config['numstates']=Content['Model'].getint('numstates')
+    Config['numactions']=Content['Model'].getint('numactions')
+    
+    Config['greenduration']=Content['Simulation'].getint('greenduration')    
+    Config['yellowduration']=Content['Simulation'].getint('yellowduration')
+    
+    Config['dpi']=Content['Visualisation'].getint('dpi')    
+
+    return Config    

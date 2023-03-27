@@ -1,6 +1,7 @@
 # Handles the main loop that starts an episode on every iteration
 
 import argparse
+import configparser
 import sys
 import os
 import datetime
@@ -47,13 +48,31 @@ def parse_args() -> argparse.Namespace:
 
 if __name__ == "__main__":
     args=parse_args()
+    config=configparser.ConfigParser()
     
     #Setting up cmd command to run sumo during simulation
     SumoCmd=SetSumo(args.Gui,"SumoConfig.sumocfg",args.MaxSteps)
     
     # Setting up the Model Directory
     DataPath=SetTrainPath("Models")
-       
+
+    # Setting up the .ini files to store the settings
+    config.add_section('Misc')
+    config.set('Misc','Gui',str(True))
+    config.set('Misc','MaxSteps',str(args.MaxSteps))
+    config.set('Misc','N_Cars',str(args.N_Cars))
+    config.add_section('Model')
+    config.set('Model','NumStates',str(args.NumStates))
+    config.set('Model','NumActions',str(args.NumActions))
+    config.add_section('Simulation')
+    config.set('Simulation','GreenDuration',str(args.GreenDuration))
+    config.set('Simulation','YellowDuration',str(args.YellowDuration))
+    config.add_section('Visualisation')
+    config.set('Visualisation','dpi',str(args.dpi))
+    FP=open(os.path.join(DataPath,"Settings.ini"),'x')
+    config.write(FP)
+    FP.close()
+           
     Episode=0
     StartTimeStamp=datetime.datetime.now() # To Show the starting time when the program is done executing
     if(args.Mode=='normal'):
