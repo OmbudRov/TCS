@@ -209,13 +209,33 @@ def ImportSettings(ConfigFile):
     Config['gui']=Content['Misc'].getboolean('gui')
     Config['maxsteps']=Content['Misc'].getint('maxsteps')
     Config['n_cars']=Content['Misc'].getint('n_cars')
-    
+        
+    Config['numlayers']=Content['Model'].getint('numlayers')
+    Config['layerwidth']=Content['Model'].getint('layerwidth')
+    Config['batchsize']=Content['Model'].getint('batchsize')
+    Config['learningrate']=Content['Model'].getfloat('learningrate')
     Config['numstates']=Content['Model'].getint('numstates')
     Config['numactions']=Content['Model'].getint('numactions')
     
     Config['greenduration']=Content['Simulation'].getint('greenduration')    
     Config['yellowduration']=Content['Simulation'].getint('yellowduration')
+    Config['trainingepochs']=Content['Simulation'].getint('trainingepochs')
     
-    Config['dpi']=Content['Visualisation'].getint('dpi')    
+    Config['dpi']=Content['Visualisation'].getint('dpi')
+    
+    Config['maxmemorysize']=Content['Memory'].getint('maxmemorysize')
+    Config['minmemorysize']=Content['Memory'].getint('minmemorysize')
+       
 
-    return Config    
+    return Config
+
+def MaxModelNumber(ModelPathName):
+    ModelPath=os.path.join(os.getcwd(),ModelPathName,'')
+    Contents=os.listdir(ModelPath)
+    if Contents:
+        PreviousVersions=[int(Name.split("_")[1]) for Name in Contents]
+        VersionNumber=str(max(PreviousVersions)-1)
+    else:
+        VersionNumber=1
+    
+    return VersionNumber

@@ -6,9 +6,11 @@ import sys
 import os
 import datetime
 import time
+import tensorflow as tf
+
 
 from model import TrainModel
-from utilities import SetSumo, SetTrainPath, Visualization, TrafficGen, Memory
+from utilities import SetSumo, SetTrainPath, Visualization, TrafficGen, Memory, ImportSettings, MaxModelNumber
 from simulations import TrainingSimulation
 
 from sumolib import checkBinary
@@ -55,27 +57,36 @@ if __name__ == "__main__":
     
     # Setting up the Model Directory
     DataPath=SetTrainPath("Models")
-
-    # Setting up the .ini files to store the settings
-    config.add_section('Misc')
-    config.set('Misc','Gui',str(True))
-    config.set('Misc','MaxSteps',str(args.MaxSteps))
-    config.set('Misc','N_Cars',str(args.N_Cars))
-    config.add_section('Model')
-    config.set('Model','NumStates',str(args.NumStates))
-    config.set('Model','NumActions',str(args.NumActions))
-    config.add_section('Simulation')
-    config.set('Simulation','GreenDuration',str(args.GreenDuration))
-    config.set('Simulation','YellowDuration',str(args.YellowDuration))
-    config.add_section('Visualisation')
-    config.set('Visualisation','dpi',str(args.dpi))
-    FP=open(os.path.join(DataPath,"Settings.ini"),'x')
-    config.write(FP)
-    FP.close()
-           
+    
     Episode=0
     StartTimeStamp=datetime.datetime.now() # To Show the starting time when the program is done executing
     if(args.Mode=='normal'):
+        
+    # Setting up the .ini files to store the settings
+        config.add_section('Misc')
+        config.set('Misc','Gui',str(True))
+        config.set('Misc','MaxSteps',str(args.MaxSteps))
+        config.set('Misc','N_Cars',str(args.N_Cars))
+        config.add_section('Model')
+        config.set('Model','NumLayers',str(args.NumLayers))
+        config.set('Model','LayerWidth',str(args.LayerWidth))
+        config.set('Model','BatchSize',str(args.BatchSize))
+        config.set('Model','LearningRate',str(args.LearningRate))
+        config.set('Model','NumStates',str(args.NumStates))
+        config.set('Model','NumActions',str(args.NumActions))
+        config.add_section('Simulation')
+        config.set('Simulation','GreenDuration',str(args.GreenDuration))
+        config.set('Simulation','YellowDuration',str(args.YellowDuration))
+        config.set('Simulation','TrainingEpochs',str(args.TrainingEpochs))
+        config.add_section('Visualisation')
+        config.set('Visualisation','dpi',str(args.dpi))
+        config.add_section('Memory')
+        config.set('Memory','MaxMemorySize',str(args.MaxMemorySize))
+        config.set('Memory','MinMemorySize',str(args.MinMemorySize))
+        FP=open(os.path.join(DataPath,"Settings.ini"),'x')
+        config.write(FP)
+        FP.close()
+
         # Initialising the Model
         Model=TrainModel(args.NumLayers,args.LayerWidth,args.BatchSize,args.LearningRate,args.NumStates,args.NumActions)
         
@@ -118,4 +129,43 @@ if __name__ == "__main__":
         
         Visualization.DataAndPlot(data=TrainingSimulation.RewardStore, filename='Reward', xlabel='Episode', ylabel='Total Negative Reward')
         Visualization.DataAndPlot(data=TrainingSimulation.TotalWaitStore, filename='Delay', xlabel='Episode', ylabel='Total Delay (In Seconds)')
-        Visualization.DataAndPlot(data=TrainingSimulation.AverageQueueLengthStore, filename='Queue', xlabel='Episode', ylabel='Average Queue Length (Number Of Vehicles)')
+        Visualization.DataAndPlot(data=TrainingSimulation.AverageQueueLengthStore, filename='Queue', xlabel='Episode', ylabel='Average Queue Length (Number Of Vehicles)') 
+
+    
+    elif(args.Mode=='retraining'):
+        DataPath=os.path.join("Models","Model_"+str(MaxModelNumber("Models")))
+        config=ImportSettings(os.path.join(DataPath,"Settings.ini"))
+        Model=TrainModel(config['numlayers'],config['layerwidth'],config['batchsize'],config['learningrate'],config['numstates'],config['numactions'],tf.keras.models.load_model(os.path.join(DataPath,'TrainedModel.h5')))
+        Visualization=Visualization(DataPath,config['dpi'])
+        Traffic=TrafficGen(config['maxsteps'],config['n_cars'])
+        Memory=Memory(config['maxmemorysize'],config['minmemorysize'])
+        TrainingSimulation=TrainingSimulation(Model,Memory,Traffic,SumoCmd,0.75,config['maxsteps'],config['greenduration'],config['yellowduration'],config['numstates'],config['numactions'],config['trainingepochs'])
+        
+        while Episode<args.TotalEpisodes:
+            print('=============== Episode',str(Episode+1), 'of', str(args.TotalEpisodes), ' ===============')
+            Epsilon=1-(Episode/args.TotalEpisodes) # Sets epsilon for the current episode for epsilon greedy policy
+            SimulationTime, TrainingTime = TrainingSimulation.RunTraining(Episode,Epsilon)
+            print('\n=============== Episode Stats ===============')
+            print('Simulation Time:', SimulationTime, 'Seconds')
+            print('Training Time:', TrainingTime, 'Seconds')
+            print('Total Time:', round(SimulationTime+TrainingTime,1), 'Seconds')
+            print('=============================================')
+            Episode+=1
+            
+            if(args.SaveSteps and Episode%5==0 and Episode!=args.TotalEpisodes):
+                Model.SaveModel(DataPath+"Episode "+str(Episode))
+                print("Model Info is saved at:",DataPath+"Episode "+str(Episode))
+                print("Pausing the Training for 10 Minutes")
+                time.sleep(600)
+                
+        print('\n=============== Session Stats ===============')
+        print('Start Time:', StartTimeStamp)
+        print('End Time:', datetime.datetime.now())
+        print('Model trained in this Session is saved at:', DataPath)
+        print('=============================================')      
+        
+        Model.SaveModel(DataPath)
+        
+        Visualization.DataAndPlot(data=TrainingSimulation.RewardStore, filename='Reward', xlabel='Episode', ylabel='Total Negative Reward')
+        Visualization.DataAndPlot(data=TrainingSimulation.TotalWaitStore, filename='Delay', xlabel='Episode', ylabel='Total Delay (In Seconds)')
+        Visualization.DataAndPlot(data=TrainingSimulation.AverageQueueLengthStore, filename='Queue', xlabel='Episode', ylabel='Average Queue Length (Number Of Vehicles)')  
