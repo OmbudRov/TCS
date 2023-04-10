@@ -91,7 +91,7 @@ if __name__ == "__main__":
         Model=TrainModel(args.NumLayers,args.LayerWidth,args.BatchSize,args.LearningRate,args.NumStates,args.NumActions)
         
         # Graphs and Stuff
-        Visualization=Visualization(DataPath,args.dpi)
+        Visualisation=Visualization(DataPath,args.dpi)
         
         #Generate Traffic/Routes taken by cars
         Traffic = TrafficGen(args.MaxSteps, args.N_Cars)
@@ -114,10 +114,14 @@ if __name__ == "__main__":
             Episode+=1
             
             if(args.SaveSteps and Episode%5==0 and Episode!=args.TotalEpisodes):
-                Model.SaveModel(DataPath+"Episode "+str(Episode))
-                print("Model Info is saved at:",DataPath+"Episode "+str(Episode))
+                StepData=DataPath+"Episode "+str(Episode)
+                Viz=Visualization(StepData,args.dpi)
+                Model.SaveModel(StepData)
+                Viz.DataAndPlot(data=TrainingSimulation.RewardStore, filename='Reward', xlabel='Episode', ylabel='Total Negative Reward')
+                Viz.DataAndPlot(data=TrainingSimulation.TotalWaitStore, filename='Delay', xlabel='Episode', ylabel='Total Delay (In Seconds)')
+                Viz.DataAndPlot(data=TrainingSimulation.AverageQueueLengthStore, filename='Queue', xlabel='Episode', ylabel='Average Queue Length (Number Of Vehicles)') 
                 print("Pausing the Training for 10 Minutes")
-                time.sleep(600)
+                #time.sleep(600)
                 
         print('\n=============== Session Stats ===============')
         print('Start Time:', StartTimeStamp)
@@ -127,16 +131,16 @@ if __name__ == "__main__":
         
         Model.SaveModel(DataPath)
         
-        Visualization.DataAndPlot(data=TrainingSimulation.RewardStore, filename='Reward', xlabel='Episode', ylabel='Total Negative Reward')
-        Visualization.DataAndPlot(data=TrainingSimulation.TotalWaitStore, filename='Delay', xlabel='Episode', ylabel='Total Delay (In Seconds)')
-        Visualization.DataAndPlot(data=TrainingSimulation.AverageQueueLengthStore, filename='Queue', xlabel='Episode', ylabel='Average Queue Length (Number Of Vehicles)') 
+        Visualisation.DataAndPlot(data=TrainingSimulation.RewardStore, filename='Reward', xlabel='Episode', ylabel='Total Negative Reward')
+        Visualisation.DataAndPlot(data=TrainingSimulation.TotalWaitStore, filename='Delay', xlabel='Episode', ylabel='Total Delay (In Seconds)')
+        Visualisation.DataAndPlot(data=TrainingSimulation.AverageQueueLengthStore, filename='Queue', xlabel='Episode', ylabel='Average Queue Length (Number Of Vehicles)') 
 
     
     elif(args.Mode=='retraining'):
         DataPath=os.path.join("Models","Model_"+str(MaxModelNumber("Models")))
         config=ImportSettings(os.path.join(DataPath,"Settings.ini"))
         Model=TrainModel(config['numlayers'],config['layerwidth'],config['batchsize'],config['learningrate'],config['numstates'],config['numactions'],tf.keras.models.load_model(os.path.join(DataPath,'TrainedModel.h5')))
-        Visualization=Visualization(DataPath,config['dpi'])
+        Visualisation=Visualization(DataPath,config['dpi'])
         Traffic=TrafficGen(config['maxsteps'],config['n_cars'])
         Memory=Memory(config['maxmemorysize'],config['minmemorysize'])
         TrainingSimulation=TrainingSimulation(Model,Memory,Traffic,SumoCmd,0.75,config['maxsteps'],config['greenduration'],config['yellowduration'],config['numstates'],config['numactions'],config['trainingepochs'])
@@ -153,8 +157,13 @@ if __name__ == "__main__":
             Episode+=1
             
             if(args.SaveSteps and Episode%5==0 and Episode!=args.TotalEpisodes):
-                Model.SaveModel(DataPath+"Episode "+str(Episode))
-                print("Model Info is saved at:",DataPath+"Episode "+str(Episode))
+                StepData=DataPath+"Episode "+str(Episode)
+                Viz=Visualization(StepData,config['dpi'])
+                Model.SaveModel(StepData)
+                Viz.DataAndPlot(data=TrainingSimulation.RewardStore, filename='Reward', xlabel='Episode', ylabel='Total Negative Reward')
+                Viz.DataAndPlot(data=TrainingSimulation.TotalWaitStore, filename='Delay', xlabel='Episode', ylabel='Total Delay (In Seconds)')
+                Viz.DataAndPlot(data=TrainingSimulation.AverageQueueLengthStore, filename='Queue', xlabel='Episode', ylabel='Average Queue Length (Number Of Vehicles)')
+                print("Model Info is saved at:",StepData)
                 print("Pausing the Training for 10 Minutes")
                 time.sleep(600)
                 
@@ -166,6 +175,6 @@ if __name__ == "__main__":
         
         Model.SaveModel(DataPath)
         
-        Visualization.DataAndPlot(data=TrainingSimulation.RewardStore, filename='Reward', xlabel='Episode', ylabel='Total Negative Reward')
-        Visualization.DataAndPlot(data=TrainingSimulation.TotalWaitStore, filename='Delay', xlabel='Episode', ylabel='Total Delay (In Seconds)')
-        Visualization.DataAndPlot(data=TrainingSimulation.AverageQueueLengthStore, filename='Queue', xlabel='Episode', ylabel='Average Queue Length (Number Of Vehicles)')  
+        Visualisation.DataAndPlot(data=TrainingSimulation.RewardStore, filename='Reward', xlabel='Episode', ylabel='Total Negative Reward')
+        Visualisation.DataAndPlot(data=TrainingSimulation.TotalWaitStore, filename='Delay', xlabel='Episode', ylabel='Total Delay (In Seconds)')
+        Visualisation.DataAndPlot(data=TrainingSimulation.AverageQueueLengthStore, filename='Queue', xlabel='Episode', ylabel='Average Queue Length (Number Of Vehicles)')  
