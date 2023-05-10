@@ -29,8 +29,8 @@ def parse_args() -> argparse.Namespace:
     # Model arguments
     Parser.add_argument('--NumLayers',help='Number of Layers in the Nueral Network',type=int,default=5)
     Parser.add_argument('--LayerWidth',help='Dimensionality of the Output Space',type=int,default=400)
-    Parser.add_argument('--BatchSize',help='Dimensionality of the Output Space',type=int,default=100)
-    Parser.add_argument('--LearningRate',help='Dimensionality of the Output Space',type=float,default=0.001)
+    Parser.add_argument('--BatchSize',help='Size of Batch',type=int,default=100)
+    Parser.add_argument('--LearningRate',help='Learning Rate for the Model',type=float,default=0.001)
     Parser.add_argument('--NumStates',help='Shape of the Inner Layers of the Nueral Network',type=int,default=80)
     Parser.add_argument('--NumActions',help='Output Shape of the Nueral Network',type=int,default=4)
     
