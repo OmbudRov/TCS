@@ -39,11 +39,11 @@ def parse_args() -> argparse.Namespace:
     
     # Memory arguments
     Parser.add_argument('--MaxMemorySize',help='Maximum Size of Memory',type=int,default=50000)
-    Parser.add_argument('--MinMemorySize',help='Maximum Size of Memory',type=int,default=600)
+    Parser.add_argument('--MinMemorySize',help='Minimum Size of Memory',type=int,default=600)
     
     # Training Simulation arguments
     Parser.add_argument('--GreenDuration',help='Duration in seconds for the traffic light to remain green',type=int,default=10)
-    Parser.add_argument('--YellowDuration',help='Duration in seconds for the traffic light to remain green',type=int,default=4)
+    Parser.add_argument('--YellowDuration',help='Duration in seconds for the traffic light to remain yellow',type=int,default=4)
     Parser.add_argument('--TrainingEpochs',type=int,default=800)
     
     return Parser.parse_args()
